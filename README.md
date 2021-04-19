@@ -11,7 +11,7 @@ Dependencies:
 ## How to use
 
 * Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
-* Run script 
+* Run the script 
 ``` bash
 python extract.py
 ```
@@ -19,13 +19,6 @@ python extract.py
 You will have two options to load dashboards:
 1. Manually add dashboards jsons (comma seperated) to `prom_dashboard.json` file
 2. Provide the account region and api token (Not data shiping), if you use this option the script will perform api calls to get all of the grafana dashboards in the logzio account
-
-
-## Limitations
-* The script cant extract metrics from panels with ES datasource
-* Working only with editble dashboards
-* Working only with valid dashboards (If grafana cant load it, the script cant extract the metrics)
-* As for now the total number of metrics is not 100% accurate, as in some cases the script detects labels as metric names
 
 ### Example output
 ```text
@@ -67,3 +60,10 @@ relabel_configs:
     action: keep
     regex: <<your-regex>>
 ```
+
+## Limitations
+* The script cant extract metrics from panels with ES datasource
+* Working only with editble dashboards
+* Working only with valid dashboards (If grafana cant load it, the script cant extract the metrics)
+* As for now the total number of metrics is not 100% accurate, as in some cases the script detects labels as metric names
+
