@@ -71,7 +71,7 @@ def _to_regex(list):
     pattern = ''
     for i, metric in enumerate(list):
         pattern = f'{pattern}{metric}' if i == 0 else f'{pattern}|{metric}'
-    print(f'As regex: \n--------------\n{pattern}')
+    print(f'As regex: \n{pattern}')
 
 
 def _init_dashboard_list(uid_list, base_url, r_headers):
@@ -160,24 +160,20 @@ for i, dashboard in enumerate(dashboards):
         pass
 all_metrics = []
 for s in dataset:
-    s['metrics'] = list(dict.fromkeys(s['metrics']))
-    print('------------')
-    print('Total number of metrics in {} : {}'.format(s['name'], len(s['metrics'])))
-    print('------------')
-    for metric in s['metrics']:
-        print(metric)
-    all_metrics.extend(s['metrics'])
+    s['metrics'] = sorted(list(dict.fromkeys(s['metrics'])))
+    if len(s['metrics']) > 0:
+        print('------------')
+        print('Total number of metrics in {} : {}'.format(s['name'], len(s['metrics'])))
+        print('------------')
+        for metric in s['metrics']:
+            print(metric)
+        _to_regex(s['metrics'])
+        all_metrics.extend(s['metrics'])
 
-all_metrics = list(set(all_metrics))
+all_metrics = sorted(list(set(all_metrics)))
 print('------------')
 print(f'Total number of distinct metrics: {len(all_metrics)}')
 print('------------')
 for metric in all_metrics:
     print(metric)
 _to_regex(all_metrics)
-with open(f'prometheus_metrics_output.yaml', 'w') as yml_output:
-    dataset.append({'name': 'all metrics',
-                    'metrics': all_metrics})
-    yaml.dump(dataset, yml_output, default_flow_style=False)
-    yml_output.truncate()
-    yml_output.close()
