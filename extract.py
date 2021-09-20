@@ -123,11 +123,12 @@ def _get_varibles(templating):
     for var in templating:
         if var['type'] == 'query':
             try:
-                names = re.findall('[a-zA-Z_:][a-zA-Z0-9_:]*', var['query'])
-                if names[0] == 'label_values':
-                    metrics.append(names[1])
-            except IndexError as e:
-                print(f'Error while parsing "{var["query"]}", error:{e}')##
+                names = re.findall('[a-zA-Z_:][a-zA-Z0-9_:]*', str(var['query']))
+                label_values_index=names.index('label_values')
+                metrics.append(names[label_values_index+1])
+            except (IndexError,ValueError) as e:
+                print(f'Error while parsing "{var["query"]}", error:{e}')
+
     return metrics
 
 
@@ -150,8 +151,9 @@ for i, dashboard in enumerate(dashboards):
     try:
         for panel in dashboard['panels']:
             if panel['type'] == 'row':
-                for row_panel in panel['panels']:
-                    _add_metrics(row_panel, i)
+                if panel.get('panels') is not None:
+                    for row_panel in panel['panels']:
+                        _add_metrics(row_panel, i)
             elif panel['type'] == 'text':
                 pass
             else:

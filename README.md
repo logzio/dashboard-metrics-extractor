@@ -5,7 +5,7 @@ Dependencies:
 
 | Libarary name | Version | Install command |
 |---|---|---|
-|[pygments_promql](https://pypi.org/project/pygments-promql/)|0.0.5|`pip install pygments-promql` |
+|[pygments_promql](https://pypi.org/project/pygments-promql/)|0.0.7|`pip install pygments-promql` |
 |Python|3.7| - |
 
 ## How to use
