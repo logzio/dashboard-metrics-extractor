@@ -17,7 +17,7 @@ python extract.py
 ```
 
 You will have two options to load dashboards:
-1. Manually add dashboards jsons (comma seperated) to `prom_dashboard.json` file
+1. Manually add dashboards jsons (comma seperated in array) to `prom_dashboard.json` file
 2. Provide the account region and api token (Not data shiping), if you use this option the script will perform api calls to get all of the grafana dashboards in the logzio account
 
 ### Example output
