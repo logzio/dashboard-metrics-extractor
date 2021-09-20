@@ -17,7 +17,7 @@ def _find_grouping(query_string):
             for idx in indices:
                 grouping_indices.append(idx + len(statement))
         except ValueError:
-            pass
+            print('Error while group parsing')
 
     return grouping_indices
 
@@ -53,18 +53,20 @@ def _find_metrics_names(expr):
 
 
 def _add_metrics(panel, i):
-    for target in panel['targets']:
-        metrics, rules = _find_metrics_names(target['expr'].replace(' ', ''))
-        dataset[i]['metrics'].extend(rules)
-        for metric in metrics:
-            name_in_rules = False
-            for rule in rules:
-                if metric in rule:
-                    name_in_rules = True
-            if metric == 'le' or metric == 'p8s_logzio_name' or name_in_rules:
-                pass
-            else:
-                dataset[i]['metrics'].append(metric)
+    targets = panel.get('targets')
+    if targets is not None:
+        for target in targets:
+            metrics, rules = _find_metrics_names(target['expr'].replace(' ', ''))
+            dataset[i]['metrics'].extend(rules)
+            for metric in metrics:
+                name_in_rules = False
+                for rule in rules:
+                    if metric in rule:
+                        name_in_rules = True
+                if metric == 'le' or metric == 'p8s_logzio_name' or name_in_rules:
+                    pass
+                else:
+                    dataset[i]['metrics'].append(metric)
 
 
 def _to_regex(list):
@@ -84,7 +86,7 @@ def _init_dashboard_list(uid_list, base_url, r_headers):
             del dashboard['meta']
             dashboards_list.append(dashboard['dashboard'])
         except KeyError:
-            pass
+            print('Error while removing meta from dashboard')
     return dashboards_list
 
 
@@ -124,9 +126,10 @@ def _get_varibles(templating):
         if var['type'] == 'query':
             try:
                 names = re.findall('[a-zA-Z_:][a-zA-Z0-9_:]*', str(var['query']))
-                label_values_index=names.index('label_values')
-                metrics.append(names[label_values_index+1])
-            except (IndexError,ValueError) as e:
+                label_values_index = names.index('label_values')
+                if names[label_values_index+1] != 'p8s_logzio_name':
+                    metrics.append(names[label_values_index + 1])
+            except (IndexError, ValueError) as e:
                 print(f'Error while parsing "{var["query"]}", error:{e}')
 
     return metrics
@@ -159,7 +162,7 @@ for i, dashboard in enumerate(dashboards):
             else:
                 _add_metrics(panel, i)
     except KeyError:
-        pass
+        print('Error while parsing the dashboard panels')
 all_metrics = []
 for s in dataset:
     s['metrics'] = sorted(list(dict.fromkeys(s['metrics'])))
