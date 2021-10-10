@@ -1,14 +1,8 @@
 # Dashboard-metrics-extractor
-Python scripts that extract metric names from Grafana dashboards.
-
-Dependencies:
-
-| Libarary name | Version | Install command |
-|---|---|---|
-|[pygments_promql](https://pypi.org/project/pygments-promql/)|0.0.7|`pip install pygments-promql` |
-|Python|3.7| - |
+Python scripts that extract metric names from Grafana dashboards, and time series from prometheus.
 
 ## How to use
+Option 1:
 
 * Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
 * Run the script 
@@ -16,9 +10,22 @@ Dependencies:
 python extract.py
 ```
 
-You will have two options to load dashboards:
-1. Manually add dashboards jsons (comma seperated in array) to `prom_dashboard.json` file
-2. Provide the account region and api token (Not data shiping), if you use this option the script will perform api calls to get all of the grafana dashboards in the logzio account
+Option 2:
+* Download the executable from the release page 
+
+You will have two options:
+1. Extract metrics and timeseries information from Grafana and Prometheus endpoint, via config or manual input.
+2. Extract metrics from logz.io endpoint, you will have two options:
+    - Manually add dashboards jsons (comma seperated in array) to `prom_dashboard.json` file
+    - Provide the account region and api token (Not data shiping), if you use this option the script will perform api calls to get all of the grafana dashboards in the logzio account
+
+### Example config:
+    prometheus:
+      endpoint: http://127.0.0.1:7000
+
+    grafana:
+      endpoint: http://127.0.0.1:8000
+      token: <<GRAFANA_API_TOKEN>>
 
 ### Example output
 ```text
@@ -62,8 +69,7 @@ relabel_configs:
 ```
 
 ## Limitations
-* The script cant extract metrics from panels with ES datasource
-* Working only with editble dashboards
-* Working only with valid dashboards (If grafana cant load it, the script cant extract the metrics)
-* As for now the total number of metrics is not 100% accurate, as in some cases the script detects labels as metric names
+* The script can't extract metrics from panels with ES datasource
+* Working only with editable dashboards
+* Working only with valid dashboards (If grafana can't load it, the script can't extract the metrics)
 
