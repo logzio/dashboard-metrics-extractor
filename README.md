@@ -17,7 +17,7 @@ python extract.py
 ```
 To start the dashboard metrics extractor as an executable:
 
-* Download the executable from the release page 
+* Download the executable from the release page .
 
 
 ### 2. Select the method to extract metrics
