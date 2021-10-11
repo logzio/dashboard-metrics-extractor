@@ -5,9 +5,9 @@ Python scripts that extract metric names from Grafana dashboards, and time serie
 
 ### 1. Start the dashboard metrics extractor
 
-You can start the dashboard metrics extractor either by running it via a python script or via an executable.
+You can start the dashboard metrics extractor either by running it as a python script or as an executable.
 
-To start the dashboard metrics extractor via a python script:
+To start the dashboard metrics extractor as a python script:
 
 1. Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
 2. Run the script as follows:
@@ -15,7 +15,7 @@ To start the dashboard metrics extractor via a python script:
 ``` bash
 python extract.py
 ```
-To start the dashboard metrics extractor via an executable:
+To start the dashboard metrics extractor as an executable:
 
 * Download the executable from the release page 
 
