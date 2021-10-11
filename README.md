@@ -2,22 +2,65 @@
 Python scripts that extract metric names from Grafana dashboards, and time series from prometheus.
 
 ## How to use
-Option 1:
 
-* Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
-* Run the script 
+### 1. Start the dashboard metrics extractor
+
+You can start the dashboard metrics extractor either by running a python script or an executable.
+
+To start the dashboard metrics extractor via a python script:
+
+1. Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
+2. Run the script as follows:
+
 ``` bash
 python extract.py
 ```
+To start the dashboard metrics extractor via an executable:
 
-Option 2:
 * Download the executable from the release page 
 
-You will have two options:
-1. Extract metrics and timeseries information from Grafana and Prometheus endpoint, via config or manual input.
-2. Extract metrics from logz.io endpoint, you will have two options:
-    - Manually add dashboards jsons (comma seperated in array) to `prom_dashboard.json` file
-    - Provide the account region and api token (Not data shiping), if you use this option the script will perform api calls to get all of the grafana dashboards in the logzio account
+
+### 2. Select the method to extract metrics
+
+The dashboard metrics extractor can extract metrics either from the Grafana/Prometheus endpoints or from the Logz.io endpoint. To select the required method:
+
+* Type **1** to select the Grafana/Prometheus endpoints and press Enter.
+* Type **2** to select the Logz.io endpoint and press Enter.
+
+### 3. Run the dashboard metrics extractor using the selected method
+
+#### Extract metrics from the Grafana/Prometheus endpoint
+
+If you select the Grafana/Prometheus endpoints, you need to specify these endpoints either via a config file or manually.
+
+To specify the endpoints via a config file:
+
+* Enter the path to the config file and press Enter.
+
+To specify the endpoints manually:
+
+1. Press Enter.
+2. Type in the Prometheus endpoint address, for example `http://127.0.0.1:7000`, and press Enter.
+3. Type in the Grafana endpoint address, for example `http://127.0.0.1:8000`, and press Enter.
+4. Type in your Grafana API token and press Enter.
+
+
+#### Extract metrics from the Logz.io endpoint
+
+If you select the Logz.io endpoints, you need to specify the endpoint either via the `prom_dashboard.json` file or manually.
+
+To specify the endpoint via `prom_dashboard.json`:
+
+1. Make sure the `prom_dashboard.json` is located in the same folder as the dashboar metrics extractor exacutable.
+2. Type **1** and press Enter.
+
+To specify the endpoints manually:
+
+1. Type **2** and press Enter.
+2. Type in the region of your Logz.io metrics account, for example `us`, and press Enter.
+3. Type in your Logz.io **API token** (not the data shipping token) and press Enter.
+
+## Example data
 
 ### Example config:
     prometheus:
@@ -71,5 +114,5 @@ relabel_configs:
 ## Limitations
 * The script can't extract metrics from panels with ES datasource
 * Working only with editable dashboards
-* Working only with valid dashboards (If grafana can't load it, the script can't extract the metrics)
+* Working only with valid dashboards (If grafana can't load it, the script won't extract the metrics)
 
