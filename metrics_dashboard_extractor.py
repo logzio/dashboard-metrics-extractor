@@ -11,6 +11,8 @@ logger = logging.getLogger()
 PROMQL_FUNCTIONS = ['sum', 'sumwithout', 'sumby', 'maxwithout', 'maxby', 'countwithout', 'countby']
 PROMQL_GROUPING_STATEMENTS = ['by(', 'on(', ',', 'group_right(', 'group_left(', 'sum_rate(']
 REGEX_FILTER = '[a-zA-Z_:][a-zA-Z0-9_:]*'
+SUPPORTED_REGIONS = ['us', 'eu', 'uk', 'nl', 'ca', 'au', 'wa']
+TOKEN_REGEX = '^[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+$'
 
 
 def _find_grouping(query_string):
@@ -238,11 +240,9 @@ def _get_dashboards_logzio_api():
     region = input("Enter logzio region:")
     api_token = input("Enter logzio api token:")
 
-    supported_regions = ['us', 'eu', 'uk', 'nl', 'ca', 'au', 'wa']
-    if region not in supported_regions:
+    if region not in SUPPORTED_REGIONS:
         raise ValueError('region code is not supported: {}'.format(region))
-    regex = '^[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+-[a-z 0-9]+$'
-    match_obj = re.search(regex, api_token)
+    match_obj = re.search(TOKEN_REGEX, api_token)
     if match_obj is None or match_obj.group() is None:
         raise ValueError("API token is invalid: {}".format(api_token))
     LOGZIO_API_HEADERS = {
