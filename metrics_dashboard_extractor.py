@@ -86,7 +86,8 @@ def _extract_metrics(dashboard):
             except (IndexError, ValueError):
                 dashboard_name = dashboard['title']
                 print(
-                    f'ERROR in dashboard {dashboard_name}, cannot parse: "{var["query"]}", dashboard might not be supported, skipping')
+                    f'ERROR in dashboard {dashboard_name}, cannot parse: "{var["query"]}", dashboard might not be '
+                    f'supported, skipping')
                 break
     return metrics
 
@@ -227,7 +228,8 @@ def logzio_metrics_extractor():
                 else:
                     _add_metrics(panel, i, dataset)
         except KeyError:
-            print('Error while parsing the dashboard panels')
+            dashboard_name=dashboard['title']
+            print(f'Error while parsing the dashboard panels for {dashboard_name}')
     all_metrics = []
     _count_total_metrics(all_metrics, dataset)
 
