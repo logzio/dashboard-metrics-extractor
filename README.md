@@ -21,7 +21,7 @@ $ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/down
  Download and run the executable (extract.exe) from the release page
 
 
-To start the dashboard metrics extractor as a python script:
+* To start the dashboard metrics extractor as a python script:
 
 1. Clone the repository `git clone https://github.com/logzio/dashboard-metrics-extractor.git`
 2. Run the following command in the repository folder:
