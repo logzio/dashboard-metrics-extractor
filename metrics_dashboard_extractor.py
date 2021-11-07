@@ -60,17 +60,18 @@ def _add_metrics(panel, index, dataset):
     targets = panel.get('targets')
     if targets is not None:
         for target in targets:
-            metrics, rules = _find_metrics_names(target['expr'].replace(' ', ''))
-            dataset[index]['metrics'].extend(rules)
-            for metric in metrics:
-                name_in_rules = False
-                for rule in rules:
-                    if metric in rule:
-                        name_in_rules = True
-                if metric == 'le' or name_in_rules:
-                    pass
-                else:
-                    dataset[index]['metrics'].append(metric)
+            if target.get('expr') is not None:
+                metrics, rules = _find_metrics_names(target['expr'].replace(' ', ''))
+                dataset[index]['metrics'].extend(rules)
+                for metric in metrics:
+                    name_in_rules = False
+                    for rule in rules:
+                        if metric in rule:
+                            name_in_rules = True
+                    if metric == 'le' or name_in_rules:
+                        pass
+                    else:
+                        dataset[index]['metrics'].append(metric)
 
 
 def _extract_metrics(dashboard):
@@ -82,8 +83,11 @@ def _extract_metrics(dashboard):
                 names = re.findall(REGEX_FILTER, str(var['query']))
                 label_values_index = names.index('label_values')
                 metrics.append(names[label_values_index + 1])
-            except (IndexError, ValueError) as e:
-                print(f'Error while parsing "{var["query"]}", error:{e}')
+            except (IndexError, ValueError):
+                dashboard_name = dashboard['title']
+                print(
+                    f'ERROR in dashboard {dashboard_name}, cannot parse: "{var["query"]}", dashboard might not be supported, skipping')
+                break
     return metrics
 
 
@@ -217,15 +221,15 @@ def logzio_metrics_extractor():
                 if panel['type'] == 'row':
                     if panel.get('panels') is not None:
                         for row_panel in panel['panels']:
-                            _add_metrics(row_panel, i,dataset)
+                            _add_metrics(row_panel, i, dataset)
                 elif panel['type'] == 'text':
                     pass
                 else:
-                    _add_metrics(panel, i,dataset)
+                    _add_metrics(panel, i, dataset)
         except KeyError:
             print('Error while parsing the dashboard panels')
     all_metrics = []
-    _count_total_metrics(all_metrics,dataset)
+    _count_total_metrics(all_metrics, dataset)
 
 
 def _get_dashboards_logzio_api():
@@ -249,4 +253,4 @@ def _get_dashboards_logzio_api():
     all_dashboards = requests.get(f'{base_url}/api/search', headers=LOGZIO_API_HEADERS)
     uids = _extract_uid_from_response(all_dashboards)
     # init list
-    return _init_dashboard_list(base_url,uids, LOGZIO_API_HEADERS)
+    return _init_dashboard_list(base_url, uids, LOGZIO_API_HEADERS)

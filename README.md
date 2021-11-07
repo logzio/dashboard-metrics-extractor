@@ -12,7 +12,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.1/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.2/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```
