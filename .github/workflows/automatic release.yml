@@ -7,27 +7,37 @@ on:
 
 jobs:
  createrelease:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     name: Create Release
     runs-on: [ubuntu-latest]
     steps:
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{github.event.head_commit.message}}
-        release_name: ${{github.event.head_commit.message}}
-        draft: false
-        prerelease: false
-    - name: Output Release URL File
-      run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
-    - name: Save Release URL File for publish
-      uses: actions/upload-artifact@v1
-      with:
-        name: release_url
-        path: release_url.txt
+     - name: check headcommit message
+       id: commit
+       run: |
+         str="$(jq '.head_commit.message' $GITHUB_EVENT_PATH)"
+         echo ::set-output name=title::${str%%\\n*} | tr -d '"'
+         echo ::set-output name=body::${str##*\\n} | tr -d '"'
+     - name: Create Release
+       id: create_release
+       uses: actions/create-release@v1
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       with:
+         tag_name: ${{steps.commit.outputs.title}}
+         release_name: ${{steps.commit.outputs.title}}
+         body: |                                                                
+            ${{ steps.commit.outputs.body}}
+         draft: false
+         prerelease: false
+     - name: Output Release URL File
+       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
+     - name: Save Release URL File for publish
+       uses: actions/upload-artifact@v1
+       with:
+         name: release_url
+         path: release_url.txt
  build:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     name: Build packages
     needs: createrelease
     runs-on: ${{ matrix.os }}
