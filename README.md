@@ -12,7 +12,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.2/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.3/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```
@@ -114,9 +114,13 @@ node_filesystem_size
 As regex: 
 kube_deployment_status_replicas|kube_deployment_status_replicas_unavailable|kube_deployment_status_replicas_updated|kube_job_status_active|kube_job_status_failed|kube_job_status_succeeded|kube_node_info|kube_node_spec_unschedulable|kube_node_status_allocatable_cpu_cores|kube_node_status_allocatable_memory_bytes|kube_node_status_allocatable_pods|kube_node_status_capacity_cpu_cores|kube_node_status_capacity_memory_bytes|kube_node_status_capacity_pods|kube_node_status_condition|kube_pod_container_resource_requests_cpu_cores|kube_pod_container_resource_requests_memory_bytes|kube_pod_container_status_restarts_total|kube_pod_container_status_running|kube_pod_container_status_terminated|kube_pod_container_status_waiting|kube_pod_info|kube_pod_status_phase|node_boot_time|node_filesystem_free|node_filesystem_size
 ------------
+Telegraf filter by input:
+kube fieldpass regex: ["deployment_status_replicas","deployment_status_replicas_unavailable","deployment_status_replicas_updated","job_status_active","job_status_failed,"job_status_succeeded","node_spec_unschedulable","node_status_allocatable_cpu_cores","node_status_allocatable_memory_bytes","node_status_allocatable_pods","node_status_capacity_cpu_cores","node_status_capacity_memory_bytes","node_status_capacity_pods","node_status_condition","pod_container_resource_requests_cpu_cores","pod_container_resource_requests_memory_bytes","pod_container_status_restarts_total","pod_container_status_running","pod_container_status_terminated","pod_container_status_waiting","pod_status_phase"]
+node fieldpass regex: ["boot_time","filesystem_free","filesystem_size"]
 ```
 
-You can use the output Regex expression to filter metric names when you ship your data, for example in prometheus you can use `relabel_configs`
+You can use the output Regex expression to filter metric names when you ship your data:
+1. In prometheus you can use `relabel_configs`
 ```yaml
 relabel_configs:
   - source_labels: [__name__]
@@ -124,8 +128,15 @@ relabel_configs:
     regex: <<your-regex>>
 ```
 
+2. In telegraf you can use fieldpass:
+```yaml
+[[inputs.__name__]]:
+  fieldpass = <<fieldpass-regex>>
+```
+
 ## Limitations
 * The script can't extract metrics from panels with ES datasource
 * Working only with editable dashboards
 * Working only with valid dashboards (If grafana can't load it, the script won't extract the metrics)
+* Telegraf regex output might not be valid in the cases of custom metrics and dashboard that is not using telegraf metric namings.
 

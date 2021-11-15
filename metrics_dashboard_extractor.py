@@ -94,11 +94,47 @@ def _extract_metrics(dashboard):
     return metrics
 
 
+def check_metric_for_telegraf_input(metric, telegraf_mapping):
+    input_end_index = 0
+    try:
+        input_end_index = metric.index('_')
+    except ValueError:
+        return
+
+    if input_end_index > 0:
+        input_name = metric[0:input_end_index]
+        input_value = metric[input_end_index + 1:len(metric)]
+        if input_name not in telegraf_mapping:
+            telegraf_mapping[input_name] = set()
+        telegraf_mapping[input_name].add(input_value)
+
+
+def format_telegraf_fieldpass(field_list):
+    fieldpass_pattern = '['
+    telegraf_metric = ''
+    for i, field in enumerate(field_list):
+        fieldpass_pattern = f'{fieldpass_pattern}"{field}"' if i == 0 else f'{fieldpass_pattern},"{field}"'
+    fieldpass_pattern += ']'
+    return fieldpass_pattern
+
+
+def print_telegraf_regex(telegraf_mapping):
+    pattern = ''
+    print('Telegraf filter by input:')
+    for key, value in telegraf_mapping.items():
+        pattern = format_telegraf_fieldpass(value)
+        print(f'{key} fieldpass regex: {pattern}')
+
+
 def _to_regex(list):
     pattern = ''
+    telegraf_mapping = dict()
     for i, metric in enumerate(list):
         pattern = f'{pattern}{metric}' if i == 0 else f'{pattern}|{metric}'
-    print(f'As regex: \n{pattern}')
+        check_metric_for_telegraf_input(metric, telegraf_mapping)
+    print(f'As Prometheus regex: \n{pattern}')
+    print('------------')
+    print_telegraf_regex(telegraf_mapping)
 
 
 def _add_panels_metrics(dashboard, i, dataset):
@@ -230,7 +266,7 @@ def logzio_metrics_extractor():
                 else:
                     _add_metrics(panel, i, dataset)
         except KeyError:
-            dashboard_name=dashboard['title']
+            dashboard_name = dashboard['title']
             print(f'Error while parsing the dashboard panels for {dashboard_name}')
     all_metrics = []
     _count_total_metrics(all_metrics, dataset)
