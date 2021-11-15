@@ -138,5 +138,5 @@ relabel_configs:
 * The script can't extract metrics from panels with ES datasource
 * Working only with editable dashboards
 * Working only with valid dashboards (If grafana can't load it, the script won't extract the metrics)
-* Telegraf regex output might not be valid in the cases of custom metrics and dashboard that is not using telegraf metric namings.
+* Telegraf regex output might not be valid in the cases of custom metrics and dashboards that are not using telegraf metric namings.
 
