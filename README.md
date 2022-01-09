@@ -60,14 +60,14 @@ To specify the endpoints manually:
 
 #### Extract metrics from the Logz.io endpoint
 
-If you select the Logz.io endpoints, you need to specify the endpoint either via the `prom_dashboard.json` file or manually.
+If you select the Logz.io endpoints, you need to specify the dashboards input either via the `prom_dashboard.json` file or by the Logzio API token.
 
-To specify the endpoint via `prom_dashboard.json`:
+To specify the input via `prom_dashboard.json`:
 
-1. Make sure the `prom_dashboard.json` is located in the same folder as the dashboar metrics extractor exacutable.
+1. Make sure the `prom_dashboard.json` is located in the same folder as the dashboard metrics extractor exacutable.
 2. Type **1** and press Enter.
 
-To specify the endpoints manually:
+To specify the input via an API token:
 
 1. Type **2** and press Enter.
 2. Type in the region of your Logz.io metrics account, for example `us`, and press Enter.
