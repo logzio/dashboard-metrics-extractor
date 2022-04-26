@@ -6,7 +6,9 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers.promql import PromQLLexer
 import requests
 
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
+
 
 PROMQL_FUNCTIONS = ['sum', 'sumwithout', 'sumby', 'maxwithout', 'maxby', 'countwithout', 'countby']
 PROMQL_GROUPING_STATEMENTS = ['by(', 'on(', ',', 'group_right(', 'group_left(', 'sum_rate(']
@@ -23,7 +25,7 @@ def _find_grouping(query_string):
             for idx in indices:
                 grouping_indices.append(idx + len(statement))
         except ValueError:
-            print(f'Error while group parsing, query string: {query_string}')
+            logger.error(f'Error while group parsing, query string: {query_string}')
 
     return grouping_indices
 
@@ -60,7 +62,7 @@ def _find_metrics_names(expr):
 
 def _add_metrics(panel, index, dataset):
     targets = panel.get('targets')
-    if targets is not None:
+    if targets is not None and dataset[index].get('metrics') is not None:
         for target in targets:
             if target.get('expr') is not None:
                 metrics, rules = _find_metrics_names(target['expr'].replace(' ', ''))
@@ -77,7 +79,11 @@ def _add_metrics(panel, index, dataset):
 
 
 def _extract_metrics(dashboard):
-    templating = dashboard['templating']['list']
+    dash_templating = dashboard.get('templating')
+    if dash_templating is None:
+        logger.error(f'No templating for dashboard: {dashboard}, skipping')
+        return
+    templating = dash_templating['list']
     metrics = []
     for var in templating:
         if var['type'] == 'query':
@@ -87,8 +93,8 @@ def _extract_metrics(dashboard):
                 metrics.append(names[label_values_index + 1])
             except (IndexError, ValueError):
                 dashboard_name = dashboard['title']
-                print(
-                    f'ERROR in dashboard {dashboard_name}, cannot parse: "{var["query"]}", dashboard might not be '
+                logger.error(
+                    f'Cannot parse: "{var["query"]}" in {dashboard_name}, dashboard might not be '
                     f'supported, skipping')
                 break
     return metrics
@@ -171,20 +177,26 @@ def _extract_dashboards_metrics(base_url, headers, response):
 
 def _init_dashboard_list(base_url, uid_list, headers=None):
     dashboards = []
+    logger.info('Initializing dashboards list from uids')
     for i, uid in enumerate(uid_list):
         response = requests.get(f'{base_url}/api/dashboards/uid/{uid}', headers=headers)
+        if response.status_code != 200:
+            response_message = response.text
+            logger.error(f'Encountered in error while fetching dashboard with uid: {uid}, message: {response_message}')
         dashboard = response.json()
         try:
             del dashboard['meta']
             dashboards.append(dashboard['dashboard'])
         except KeyError:
             dash_title = dashboard['dashboard']['title']
-            print(f'Error while removing meta from dashboard: {dash_title}')
+            logger.error(f'Error while removing meta from dashboard: {dash_title}')
     return dashboards
 
 
 def _count_total_metrics(all_metrics, dataset) -> list:
     for s in dataset:
+        if s['metrics'] is None:
+            continue
         s['metrics'] = sorted(list(dict.fromkeys(s['metrics'])))
         if len(s['metrics']) > 0:
             print('------------')
@@ -205,6 +217,9 @@ def _count_total_metrics(all_metrics, dataset) -> list:
 
 
 def _extract_uid_from_response(response):
+    logger.info('Extracting dashboards uids')
+    if response.status_code != 200:
+        raise requests.ConnectionError(response.text)
     response_json = json.loads(response.content)
     uid_list = []
     for dashboard in response_json:
@@ -249,27 +264,29 @@ def logzio_metrics_extractor():
         raise ValueError('Input must be 1 or 2')
 
     dataset = []
-    for i, dashboard in enumerate(dashboards):
-        var_metrics = _extract_metrics(dashboard)
-        dataset.append({
-            'name': dashboard['title'],
-            'metrics': var_metrics
-        })
-        try:
-            for panel in dashboard['panels']:
-                if panel['type'] == 'row':
-                    if panel.get('panels') is not None:
-                        for row_panel in panel['panels']:
-                            _add_metrics(row_panel, i, dataset)
-                elif panel['type'] == 'text':
-                    pass
-                else:
-                    _add_metrics(panel, i, dataset)
-        except KeyError:
-            dashboard_name = dashboard['title']
-            print(f'Error while parsing the dashboard panels for {dashboard_name}')
-    all_metrics = []
-    _count_total_metrics(all_metrics, dataset)
+
+    if dashboards is not None:
+        for i, dashboard in enumerate(dashboards):
+            var_metrics = _extract_metrics(dashboard)
+            dataset.append({
+                'name': dashboard['title'],
+                'metrics': var_metrics
+            })
+            try:
+                for panel in dashboard['panels']:
+                    if panel['type'] == 'row':
+                        if panel.get('panels') is not None:
+                            for row_panel in panel['panels']:
+                                _add_metrics(row_panel, i, dataset)
+                    elif panel['type'] == 'text':
+                        pass
+                    else:
+                        _add_metrics(panel, i, dataset)
+            except KeyError:
+                dashboard_name = dashboard['title']
+                logger.error(f'Error while parsing the dashboard panels for {dashboard_name}')
+        all_metrics = []
+        _count_total_metrics(all_metrics, dataset)
 
 
 def _get_dashboards_logzio_api():
@@ -289,6 +306,11 @@ def _get_dashboards_logzio_api():
     }
     base_url = 'https://api.logz.io/v1/grafana' if region == 'us' else f'https://api-{region}.logz.io/v1/grafana/'
     all_dashboards = requests.get(f'{base_url}/api/search', headers=LOGZIO_API_HEADERS)
-    uids = _extract_uid_from_response(all_dashboards)
+    dashboard_list = None
+    try:
+        uids = _extract_uid_from_response(all_dashboards)
+        dashboard_list = _init_dashboard_list(base_url, uids, LOGZIO_API_HEADERS)
+    except requests.ConnectionError as e:
+        logger.error(f"Encountered an error: {str(e)}")
     # init list
-    return _init_dashboard_list(base_url, uids, LOGZIO_API_HEADERS)
+    return dashboard_list
