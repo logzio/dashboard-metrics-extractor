@@ -12,7 +12,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.4/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.5/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```
@@ -60,12 +60,13 @@ To specify the endpoints manually:
 
 #### Extract metrics from the Logz.io endpoint
 
-If you select the Logz.io endpoints, you need to specify the dashboards input either via the `prom_dashboard.json` file or by the Logzio API token.
+If you select the Logz.io endpoints, you need to specify the dashboards input either via the `dashboards` folder or by the Logzio API token.
 
-To specify the input via `prom_dashboard.json`:
+To specify the input via `dashboards` folder:
 
-1. Make sure the `prom_dashboard.json` is located in the same folder as the dashboard metrics extractor exacutable.
-2. Type **1** and press Enter.
+1. Make sure the `dashboards` folder is located in the same folder as the dashboard metrics extractor executable.
+2. Place each dashboard file in the `dashboards` - the output will be presented with the dashboard name.
+3. Type **1** and press Enter.
 
 To specify the input via an API token:
 
