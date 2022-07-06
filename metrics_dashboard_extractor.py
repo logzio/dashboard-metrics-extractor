@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import re
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
@@ -8,7 +9,6 @@ import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
-
 
 PROMQL_FUNCTIONS = ['sum', 'sumwithout', 'sumby', 'maxwithout', 'maxby', 'countwithout', 'countby']
 PROMQL_GROUPING_STATEMENTS = ['by(', 'on(', ',', 'group_right(', 'group_left(', 'sum_rate(']
@@ -253,18 +253,29 @@ def get_total_metrics_count(config):
         logger.error('Invalid input for grafana api, skipping dashboard metrics count')
 
 
+def get_dashboards_from_folder():
+    dashboards = []
+    filenames = os.listdir("dashboards")
+    for filename in filenames:
+        dashboard = json.load(open("dashboards/" + filename))
+        dashboards.append(dashboard)
+    return dashboards
+
+
 def logzio_metrics_extractor():
-    choice = input("select:\n1. load data from `prom_dashboard.json`\n2. load data using api token\n")
+    choice = input("select:\n1. load data from the dashboards folder\n2. load data using api token\n")
     if int(choice) == 1:
-        data = open('prom_dashboard.json')
-        dashboards = json.load(data)
+        dashboards = get_dashboards_from_folder()
     elif int(choice) == 2:
         dashboards = _get_dashboards_logzio_api()
     else:
         raise ValueError('Input must be 1 or 2')
 
-    dataset = []
+    handle_dashboards(dashboards)
 
+
+def handle_dashboards(dashboards):
+    dataset = []
     if dashboards is not None:
         for i, dashboard in enumerate(dashboards):
             var_metrics = _extract_metrics(dashboard)
