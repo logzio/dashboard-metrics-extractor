@@ -145,16 +145,18 @@ def _to_regex(list):
 
 def _add_panels_metrics(dashboard, i, dataset):
     try:
-        for row in dashboard['rows']:
-            for panel in row['panels']:
-                if panel['type'] == 'row':
-                    if panel.get('panels') is not None:
-                        for row_panel in panel['panels']:
-                            _add_metrics(row_panel, i, dataset)
-                elif panel['type'] == 'text':
-                    pass
-                else:
-                    _add_metrics(panel, i, dataset)
+        panels = dashboard.get('rows')
+        if not panels:
+            panels = dashboard['panels']
+        for panel in panels:
+            if panel['type'] == 'row':
+                if panel.get('panels') is not None:
+                    for row_panel in panel['panels']:
+                        _add_metrics(row_panel, i, dataset)
+            elif panel['type'] == 'text':
+                pass
+            else:
+                _add_metrics(panel, i, dataset)
     except KeyError:
         dashboard_title = dashboard['title']
         logger.error(f'Could not parse dashboard panels, skipping panels for dashboard: {dashboard_title}')

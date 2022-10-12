@@ -24,9 +24,11 @@ def _count_prometheus_total_timeseries(response):
 def get_prometheus_timeseries_count(config: dict, metrics):
     try:
         prometheus_config = config['prometheus']
-        if prometheus_config.get('endpoint') is not None:
+        if prometheus_config.get('endpoint'):
             _get_total_timeseries_count(prometheus_config.get('endpoint'))
             _get_used_timeseries_count(prometheus_config.get('endpoint'), metrics)
+        else:
+            logger.info("No prometheus endpoint found, skipping timeseries count")
     except KeyError:
         logger.error('Invalid config for prometheus server, skipping time series count')
 
