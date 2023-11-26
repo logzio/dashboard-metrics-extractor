@@ -12,7 +12,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.6/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.0.7/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```
@@ -53,9 +53,11 @@ To specify the endpoints via a config file:
 To specify the endpoints manually:
 
 1. Press Enter.
-2. Type in the Prometheus endpoint address, for example `http://127.0.0.1:7000`, and press Enter.
-3. Type in the Grafana endpoint address, for example `http://127.0.0.1:8000`, and press Enter.
-4. Type in your Grafana API token and press Enter.
+2. Type in the Grafana endpoint address, for example `http://127.0.0.1:8000`, and press Enter.
+3. Type in your Grafana API token and press Enter.
+4. Type in the Prometheus endpoint address, for example `http://127.0.0.1:7000`, and press Enter.
+5. Type in the Prometheus used timeseries interval (only minutes timeframe is supported), for example `10m` or press Enter to use the default.
+
 
 
 #### Extract metrics from the Logz.io endpoint
@@ -79,6 +81,7 @@ To specify the input via an API token:
 ### Example config:
     prometheus:
       endpoint: http://127.0.0.1:7000
+      used_timeseries_interval: 5m    // optional. Only minute timeframe is supported. defaults to 5m.
 
     grafana:
       endpoint: http://127.0.0.1:8000
