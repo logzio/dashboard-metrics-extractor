@@ -23,7 +23,7 @@ def get_config() -> dict:
             grafana_api_token = input('Please enter grafana api token: ')
             prometheus_endpoint = input('Please enter prometheus endpoint: ')
             prometheus_used_timeseries_interval = input(
-                'Please enter prometheus used timeseries interval in minutes (i.e 1m, 2m) or enter to use the default of 5m (recommended): ')
+                'Please enter prometheus timeseries count interval in minutes (i.e 1m, 2m) or enter to use the default of 5m (recommended): ')
             return {'grafana': {'endpoint': grafana_endpoint, 'token': grafana_api_token},
                     'prometheus': {'endpoint': prometheus_endpoint,
-                                   'used_timeseries_interval': prometheus_used_timeseries_interval}}
+                                   'timeseries_count_interval': prometheus_used_timeseries_interval}}
