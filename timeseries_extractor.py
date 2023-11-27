@@ -23,10 +23,10 @@ def _count_prometheus_total_timeseries(response, total_count_timseries_interval)
         response_json = json.loads(response.content)
         try:
             timeseries_count = response_json.get('data').get('result')[0].get('value')[1]
-            print('Total time series count: {}'.format(timeseries_count))
+            logger.info(f'Total time series count: {timeseries_count}')
         except Exception:
             timeseries_count = 0
-        print(f'Total time series in the last {total_count_timseries_interval}: {timeseries_count}')
+        logger.info(f'Total time series in the last {total_count_timseries_interval}: {timeseries_count}')
     else:
         logger.error(f"Prometheus API returned error: {response.error_code} for total timeseries count query")
 
@@ -75,7 +75,7 @@ def _get_used_timeseries_count(endpoint, used_timeseries_interval, metrics):
             used_timeseries_count = response_json.get('data').get('result')[0].get('value')[1]
         except Exception:
             used_timeseries_count = 0
-        print(f'Total used time series in the last {used_timeseries_interval}: {used_timeseries_count}')
+        logger.info(f'Total used time series in the last {used_timeseries_interval}: {used_timeseries_count}')
     else:
         logger.error(
             "Recieved status code: {} from prometheus, cannot complete the used time series request".format(

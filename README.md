@@ -56,7 +56,7 @@ To specify the endpoints manually:
 2. Type in the Grafana endpoint address, for example `http://127.0.0.1:8000`, and press Enter.
 3. Type in your Grafana API token and press Enter.
 4. Type in the Prometheus endpoint address, for example `http://127.0.0.1:7000`, and press Enter.
-5. Type in the Prometheus timeseries count interval (only minutes timeframe is supported), for example `10m` or press Enter to use the default.
+5. Type in the Prometheus timeseries count interval (only minutes timeframe is supported), for example `10m` or press Enter to use the default (5m).
 
 
 
