@@ -1,6 +1,4 @@
 import logging
-import os
-
 import yaml
 
 logger = logging.getLogger()
@@ -24,5 +22,8 @@ def get_config() -> dict:
             grafana_endpoint = input('No config file found, please enter grafana endpoint: ')
             grafana_api_token = input('Please enter grafana api token: ')
             prometheus_endpoint = input('Please enter prometheus endpoint: ')
+            prometheus_used_timeseries_interval = input(
+                'Please enter prometheus timeseries count interval in minutes (i.e 1m, 2m) or enter to use the default of 5m (recommended): ')
             return {'grafana': {'endpoint': grafana_endpoint, 'token': grafana_api_token},
-                    'prometheus': {'endpoint': prometheus_endpoint}}
+                    'prometheus': {'endpoint': prometheus_endpoint,
+                                   'timeseries_count_interval': prometheus_used_timeseries_interval}}

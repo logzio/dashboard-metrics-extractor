@@ -236,14 +236,17 @@ def get_total_metrics_count(config):
         if grafana_config.get('endpoint') is not None:
             try:
                 base_url = grafana_config.get('endpoint')
+                logger.info(f"Grafana endpoint base url: {base_url}")
                 headers = {'Authorization': 'Bearer ' + grafana_config['token'],
                            'Content-Type': 'application/json', 'Accept': 'application/json'}
+                search_url=base_url + '/api/search'
+                logger.info(f"Grafana endpoint search url: {search_url}")
                 response = requests.get(
-                    base_url + '/api/search'
+                    search_url
                     , headers=headers)
                 if response.status_code != 200:
                     logger.error(
-                        "Received status code: {} , cannot complete dashboards fetch".format(response.status_code))
+                        "Received status code: {}, cannot complete dashboards fetch".format(response.status_code))
                     return
                 return _extract_dashboards_metrics(base_url, headers, response)
             except requests.HTTPError:
