@@ -1,5 +1,8 @@
 # Dashboard-metrics-extractor
 Python scripts that extract metric names from Grafana dashboards, and time series from prometheus.
+The script will extract the metric names from all  grafana dashboards and provide a regex that can be used to with prometheus filter or telegraf fieldpass. 
+When extracting metrics from grafana endpoint, the script will also count the total time series in the provided prometheus database (within interval)
+and count the used timeseries of the extracted dashboard metrics (within interval).
 
 ## How to use
 
@@ -12,7 +15,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.1.0/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.1.1/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```

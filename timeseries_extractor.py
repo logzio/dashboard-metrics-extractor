@@ -6,7 +6,8 @@ import requests
 
 logger = logging.getLogger()
 
-PROMETHEUS_API_QUERY_PREFIX = '/api/v1/query?query='
+PROMETHEUS_BASE_QUERY_URL='/api/v1/query'
+PROMETHEUS_API_QUERY_PREFIX = '?query='
 PROMETHEUS_TOTAL_TIMESERIES_COUNT_METRIC = 'prometheus_tsdb_head_series['
 PROMETHEUS_LAST_OVER_TIME_QUERY_PREFIX = 'last_over_time('
 PROMETHEUS_COUNT_FUNCTION_PREFIX = 'count('
@@ -60,15 +61,17 @@ def extract_timeseries_interval(prometheus_config):
 
 
 def _get_used_timeseries_count(endpoint, used_timeseries_interval, metrics):
-    query_url = endpoint + PROMETHEUS_API_QUERY_PREFIX + PROMETHEUS_COUNT_FUNCTION_PREFIX + PROMETHEUS_LAST_OVER_TIME_QUERY_PREFIX + PROMETHEUS_METRIC_NAME_PREFIX
-    metrics_regex = ''
+    query_url = endpoint + PROMETHEUS_BASE_QUERY_URL
+    metrics_regex = PROMETHEUS_COUNT_FUNCTION_PREFIX + PROMETHEUS_LAST_OVER_TIME_QUERY_PREFIX + PROMETHEUS_METRIC_NAME_PREFIX
     for i, metric in enumerate(metrics):
         metrics_regex += metric
         if i < len(metrics) - 1:
             metrics_regex += '|'
-    query_url += metrics_regex + PROMETHEUS_METRIC_NAME_CLOSING_PERENTHESIS + f'[{used_timeseries_interval}])' + CLOSING_PERENTHESIS
+    metrics_regex += PROMETHEUS_METRIC_NAME_CLOSING_PERENTHESIS + f'[{used_timeseries_interval}])' + CLOSING_PERENTHESIS
+    post_query = {'query': metrics_regex}
     logger.info(f"Prometheus used timeseries count query url: {query_url}")
-    response = requests.get(query_url)
+    logger.info(f"Prometheus used timeseries count query body: {metrics_regex}")
+    response = requests.post(query_url, data=post_query)
     if response.status_code == 200:
         response_json = json.loads(response.content)
         try:
@@ -83,7 +86,7 @@ def _get_used_timeseries_count(endpoint, used_timeseries_interval, metrics):
 
 
 def _get_total_timeseries_count(endpoint, total_count_timeseries_interval):
-    total_timeseries_count_url = endpoint + PROMETHEUS_API_QUERY_PREFIX + PROMETHEUS_LAST_OVER_TIME_QUERY_PREFIX + PROMETHEUS_TOTAL_TIMESERIES_COUNT_METRIC + total_count_timeseries_interval + PROMETHEUS_INTERVAL_TIME_FUNCTION_SUFFIX
+    total_timeseries_count_url = endpoint +PROMETHEUS_BASE_QUERY_URL+ PROMETHEUS_API_QUERY_PREFIX + PROMETHEUS_LAST_OVER_TIME_QUERY_PREFIX + PROMETHEUS_TOTAL_TIMESERIES_COUNT_METRIC + total_count_timeseries_interval + PROMETHEUS_INTERVAL_TIME_FUNCTION_SUFFIX
     logger.info(f"Prometheus total timeseries count query url: {total_timeseries_count_url}")
     try:
         response = requests.get(
