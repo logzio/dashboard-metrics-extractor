@@ -4,7 +4,10 @@ import settings_reader
 import metrics_dashboard_extractor
 import timeseries_extractor
 
+SCRIPT_VERSION = "0.1.1"
+
 if __name__ == '__main__':
+    print(f"*** Running script version {SCRIPT_VERSION} ***")
     menu_choice = settings_reader.read_menu_input()
     if menu_choice == 1:
         config = settings_reader.get_config()
