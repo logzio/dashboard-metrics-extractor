@@ -15,7 +15,7 @@ You can start the dashboard metrics extractor either by running it as a python s
  Run the following command in the terminal:
 
 ```bash 
-$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.1.1/extract \
+$ curl -L -O https://github.com/logzio/dashboard-metrics-extractor/releases/download/V0.1.2/extract \
        && sudo chmod 755 extract \
        && ./extract
 ```
@@ -146,4 +146,12 @@ relabel_configs:
 * Working only with editable dashboards
 * Working only with valid dashboards (If grafana can't load it, the script won't extract the metrics)
 * Telegraf regex output might not be valid in the cases of custom metrics and dashboards that are not using telegraf metric namings.
+
+
+## Changelog
+* 0.1.2
+  - Changed prometheus used timeseries query: 
+    Each metric will be queried separately to avoid long response times and processing errors.
+  - Added a retry mechanism for failed queries - up to 4 retries.
+  - Improved logging and error handling.
 

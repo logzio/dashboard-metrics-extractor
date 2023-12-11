@@ -4,7 +4,7 @@ import settings_reader
 import metrics_dashboard_extractor
 import timeseries_extractor
 
-SCRIPT_VERSION = "0.1.1"
+SCRIPT_VERSION = "0.1.2"
 
 if __name__ == '__main__':
     print(f"*** Running script version {SCRIPT_VERSION} ***")
